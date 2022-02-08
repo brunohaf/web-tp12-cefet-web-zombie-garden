@@ -95,7 +95,7 @@ router.post('/', async (req, res, next) => {
                                        VALUES (?, ?)`,
                                       [req.body.name, 1])
     if (result.affectedRows !== 1) {
-      req.flash('error', 'Não foi possível inserir um infeliz.')
+      req.flash('error', `Não foi possível inserir ${req.body.name}.`)
     } else {
       req.flash('success', 'Isca de zumbi adicionada com sucesso!.')
     }
@@ -115,6 +115,29 @@ router.post('/', async (req, res, next) => {
 //   2. Redirecionar para a rota de listagem de pessoas
 //      - Em caso de sucesso do INSERT, colocar uma mensagem feliz
 //      - Em caso de erro do INSERT, colocar mensagem vermelhinha
+router.delete('/:id', async (req, res, next) => {
+  console.log(req.params)
+  try {
+    const [people] = await db.execute(`SELECT * FROM person                                       
+                                       WHERE id=?`,
+                                      [req.params.id])
+    const person = people[0]                                      
+    console.log(person.name)
+    const [result] = await db.execute(`DELETE FROM person
+                                       WHERE id=?;`,
+                                      [req.params.id])
+    if (result.affectedRows !== 1) {
+      req.flash('error', `Não foi possível eliminar ${person.name} da existência!`)
+    } else {
+      req.flash('success', `${person.name} teve um destino bem pior que virar snack de zumbi!`)
+    }
+    
+  } catch (error) {
+    req.flash('error', `Erro desconhecido. Descrição: ${error}`)
 
+  } finally {
+    res.redirect('/people')
+  }
+})
 
 export default router
