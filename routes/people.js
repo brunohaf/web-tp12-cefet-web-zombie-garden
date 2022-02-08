@@ -26,12 +26,14 @@ router.get('/', async (req, res, next) => {
     //   - por exemplo, assim que uma pessoa é excluída, uma mensagem de
     //     sucesso pode ser mostrada
     // - error: idem para mensagem de erro
-    res.render('list-people', {
-      people,
-      success: req.flash('success'),
-      error: req.flash('error')
+    res.format({
+      html: () => res.render('list-people', { 
+        people,
+        success: req.flash('success'),
+        error: req.flash('error') 
+      }),
+      json: () => res.json({ people })
     })
-
   } catch (error) {
     console.error(error)
     error.friendlyMessage = 'Problema ao recuperar pessoas'
@@ -116,7 +118,6 @@ router.post('/', async (req, res, next) => {
 //      - Em caso de sucesso do INSERT, colocar uma mensagem feliz
 //      - Em caso de erro do INSERT, colocar mensagem vermelhinha
 router.delete('/:id', async (req, res, next) => {
-  console.log(req.params)
   try {
     const [people] = await db.execute(`SELECT * FROM person                                       
                                        WHERE id=?`,
